@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Tenant Rent Calculator</title>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="p-6">
+    <h1 class="text-3xl font-bold text-center mb-8">Tenant Rent Calculator</h1>
+    <div class="flex flex-col md:flex-row">
+        <!-- Input Section -->
+        <div class="md:w-1/2">
+            <div class="card bg-base-200 shadow-xl p-6">
+                <h2 class="text-2xl font-bold mb-4">Costs</h2>
+                <!-- Electricity & Heating -->
+                <div class="form-control mb-4">
+                    <label class="label" for="heating">
+                        <span class="label-text">Electricity & Heating</span>
+                    </label>
+                    <input type="number" id="heating" value="3200" min="0" step="any"
+                        class="input input-bordered w-full">
+                </div>
+                <!-- Garbage and Water -->
+                <div class="form-control mb-4">
+                    <label class="label" for="garbage">
+                        <span class="label-text">Garbage and Water</span>
+                    </label>
+                    <input type="number" id="garbage" value="1800" min="0" step="any"
+                        class="input input-bordered w-full">
+                </div>
+                <!-- Chimney Sweeping -->
+                <div class="form-control mb-4">
+                    <label class="label" for="chimney">
+                        <span class="label-text">Chimney Sweeping</span>
+                    </label>
+                    <input type="number" id="chimney" value="200" min="0" step="any"
+                        class="input input-bordered w-full">
+                </div>
+                <!-- Broadband -->
+                <div class="form-control mb-4">
+                    <label class="label" for="broadband">
+                        <span class="label-text">Broadband</span>
+                    </label>
+                    <input type="number" id="broadband" value="350" min="0" step="any"
+                        class="input input-bordered w-full">
+                </div>
+                <!-- Renovating Budget -->
+                <div class="form-control mb-4">
+                    <label class="label" for="renovation">
+                        <span class="label-text">Renovating Budget</span>
+                    </label>
+                    <input type="number" id="renovation" value="2000" min="0" step="any"
+                        class="input input-bordered w-full">
+                </div>
+                <!-- Insurance -->
+                <div class="form-control mb-4">
+                    <label class="label" for="insurance">
+                        <span class="label-text">Insurance</span>
+                    </label>
+                    <input type="number" id="insurance" value="1500" min="0" step="any"
+                        class="input input-bordered w-full">
+                </div>
+                <!-- Extra Costs -->
+                <div class="form-control mb-4">
+                    <label class="label" for="baseCost">
+                        <span class="label-text">Extra Costs</span>
+                    </label>
+                    <input type="number" id="baseCost" value="0" min="0" step="any" class="input input-bordered w-full">
+                </div>
+            </div>
+            <br><br>
+            <!-- Loan & Mortgage -->
+            <div class="card bg-base-200 shadow-xl p-6">
+                <h2 class="text-2xl font-bold mb-4">Loan & Mortgage</h2>
+                <!-- Total Loan -->
+                <div class="form-control mb-4">
+                    <label class="label" for="loan">
+                        <span class="label-text">Loan</span>
+                    </label>
+                    <input type="number" id="loan" value="2800000" min="0" step="any"
+                        class="input input-bordered w-full">
+                </div>
+                <!-- Rent -->
+                <div class="form-control mb-4">
+                    <label class="label" for="rent">
+                        <span class="label-text">Rent (%)</span>
+                    </label>
+                    <input type="number" id="rent" value="3.78" min="0" step="any" class="input input-bordered w-full">
+                </div>
+                <!-- Principal Repayment (Per Month) -->
+                <div class="form-control mb-4">
+                    <label class="label" for="repayment">
+                        <span class="label-text">Principal repayment</span>
+                    </label>
+                    <input type="number" id="repayment" value="0" min="0" step="any"
+                        class="input input-bordered w-full">
+                </div>
+                <div class="col-span-2">
+                    <div class="divider my-2"></div>
+                </div>
+                <!-- Mortgage (Per Month) -->
+                <div class="form-control mb-4">
+                    <label class="label" for="mortgage">
+                        <span class="label-text">Mortgage (Per Month)</span>
+                    </label>
+                    <input type="number" id="mortgage" value="0" min="0" step="any" class="input input-bordered w-full">
+                </div>
+            </div>
+            <br><br>
+            <!-- Tax Related -->
+            <div class="card bg-base-200 shadow-xl p-6">
+                <h2 class="text-2xl font-bold mb-4">Tax Related</h2>
+                <!-- Property Tax (Yearly) -->
+                <div class="form-control mb-4">
+                    <label class="label" for="propertyTax">
+                        <span class="label-text">Property Tax (Yearly)</span>
+                    </label>
+                    <input type="number" id="propertyTax" value="24000" min="0" step="any"
+                        class="input input-bordered w-full">
+                </div>
+                <!-- Fixed Deduction (Yearly) -->
+                <div class="form-control mb-4">
+                    <label class="label" for="fixedDeduction">
+                        <span class="label-text">Fixed Deduction (Yearly)</span>
+                    </label>
+                    <input type="number" id="fixedDeduction" value="40000" min="0" step="any"
+                        class="input input-bordered w-full">
+                </div>
+                <!-- Percent Deduction (%) -->
+                <div class="form-control mb-4">
+                    <label class="label" for="percentDeduction">
+                        <span class="label-text">Percent Deduction (%)</span>
+                    </label>
+                    <input type="number" id="percentDeduction" value="20" min="0" step="any"
+                        class="input input-bordered w-full">
+                </div>
+                <!-- Percent Mortgage Deduction (%) -->
+                <div class="form-control mb-4">
+                    <label class="label" for="percentMortgageDeduction">
+                        <span class="label-text">Percent Mortgage Deduction (%)</span>
+                    </label>
+                    <input type="number" id="percentMortgageDeduction" value="30" min="0" step="any"
+                        class="input input-bordered w-full">
+                </div>
+                <!-- Capital Gains Tax (%) -->
+                <div class="form-control mb-4">
+                    <label class="label" for="capitalGainTax">
+                        <span class="label-text">Capital Gains Tax (%)</span>
+                    </label>
+                    <input type="number" id="capitalGainTax" value="30" min="0" step="any"
+                        class="input input-bordered w-full">
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Section -->
+        <div class="md:w-1/2 md:ml-8 mt-8 md:mt-0">
+            <div class="card bg-base-200 shadow-xl p-6">
+                <h2 class="text-2xl font-bold mb-4">Calculation Results</h2>
+                <div class="grid grid-cols-2 gap-2">
+                    <p class="text-lg font-semibold">Mortgage (after Deduction)</p>
+                    <p class="text-lg text-right" id="deductedMortgage">0</p>
+                    <p class="text-lg font-semibold">Total Cost (leaseholder)</p>
+                    <p class="text-lg text-right" id="totalCost">0</p>
+                    <p class="text-lg font-semibold">Tenant Rent (without tax deduction)</p>
+                    <p class="text-lg text-right" id="tenantRent1">0</p>
+                    <p class="text-lg font-semibold">Taxable Income</p>
+                    <p class="text-lg text-right" id="taxableIncome">0</p>
+                    <p class="text-lg font-semibold">Tax</p>
+                    <p class="text-lg text-right" id="tax">0</p>
+                    <div class="col-span-2">
+                        <div class="divider my-2"></div>
+                    </div>
+                    <p class="text-lg font-semibold">Tenant Rent</p>
+                    <p class="text-lg text-right font-bold" id="tenantRent">0</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Get references to input fields and result spans
+        const heatingInput = document.getElementById('heating');
+        const garbageInput = document.getElementById('garbage');
+        const chimneyInput = document.getElementById('chimney');
+        const broadbandInput = document.getElementById('broadband');
+        const renovationInput = document.getElementById('renovation');
+        const insuranceInput = document.getElementById('insurance');
+        const baseCostInput = document.getElementById('baseCost');
+        // Loan & Mortgage
+        const loanInput = document.getElementById('loan');
+        const rentInput = document.getElementById('rent');
+        const repaymentInput = document.getElementById('repayment');
+        const mortgageInput = document.getElementById('mortgage');
+
+        // Tax related inputs
+        const propertyTaxInput = document.getElementById('propertyTax');
+        const fixedDeductionInput = document.getElementById('fixedDeduction');
+        const capitalGainTaxInput = document.getElementById('capitalGainTax');
+        const percentDeductionInput = document.getElementById('percentDeduction');
+        const percentMortgageDeductionInput = document.getElementById('percentMortgageDeduction');
+
+        const deductedMortgageOutput = document.getElementById('deductedMortgage');
+        const tenantRent1Output = document.getElementById('tenantRent1');
+        const taxableIncomeOutput = document.getElementById('taxableIncome');
+        const totalCostSpanOutput = document.getElementById('totalCost');
+        const taxSpanOutput = document.getElementById('tax');
+        const tenantRentSpanOutput = document.getElementById('tenantRent');
+
+        // Function to format numbers as currency
+        function formatCurrency(value) {
+            return Number(value).toLocaleString('sv-SE', { style: 'currency', currency: 'SEK' });
+        }
+
+        // Function to calculate and update the results
+        function calculate() {
+            // Get input values and ensure they are numbers
+            const heating = parseFloat(heatingInput.value) || 0;
+            const garbage = parseFloat(garbageInput.value) || 0;
+            const chimney = parseFloat(chimneyInput.value) || 0;
+            const broadband = parseFloat(broadbandInput.value) || 0;
+            const renovation = parseFloat(renovationInput.value) || 0;
+            const insurance = parseFloat(insuranceInput.value) || 0;
+            const baseCost = parseFloat(baseCostInput.value) || 0;
+
+            // Loan & Mortgage
+            const loan = parseFloat(loanInput.value) || 0;
+            const rent = parseFloat(rentInput.value) || 0;
+            const repayment = parseFloat(repaymentInput.value) || 0;
+            var mortgage = parseFloat(mortgageInput.value) || 0;
+
+            if (loan > 0 && rent > 0) {
+                mortgage =  ((loan/12) * (rent / 100)).toFixed();
+                // Update the inout field with the calculated mortgage
+                mortgageInput.value = mortgage;
+            }
+
+            // Fixed Deduction
+            let propertyTax = parseFloat(propertyTaxInput.value) || 0;
+            var fixedDeduction = parseFloat(fixedDeductionInput.value) || 0;
+            var capitalGainTax = parseFloat(capitalGainTaxInput.value) || 0;
+            var percentDeduction = parseFloat(percentDeductionInput.value) || 0;
+            var percentMortgageDeduction = parseFloat(percentMortgageDeductionInput.value) || 0;
+
+            // Ensure values are properly formatted
+            propertyTax = propertyTax > 0 ? propertyTax / 12 : 0;
+            percentMortgageDeduction = percentMortgageDeduction > 0 ? percentMortgageDeduction / 100 : 0;
+            fixedDeduction = fixedDeduction > 0 ? fixedDeduction / 12 : 0;
+            percentDeduction = percentDeduction > 0 ? percentDeduction / 100 : 0;
+            capitalGainTax = capitalGainTax > 0 ? capitalGainTax / 100 : 0;
+
+            const deductedMortgage = (mortgage * (1 - percentMortgageDeduction));
+
+            // Calculate Total Cost for Leaseholder
+            const totalCost = heating + garbage + chimney + broadband +
+                baseCost + renovation + deductedMortgage + repayment +
+                insurance + propertyTax;
+
+            // Tenant Rent #1
+            const tenantRent1 = totalCost / (1 - capitalGainTax);
+
+            // Numerically calculate the tenant rent since tenantRent1 is overestimated
+            var tenantRent = tenantRent1;
+            var lastTest = tenantRent1;
+
+            for (var i = tenantRent1; i > totalCost; i -= 100) {
+                const testTaxableIncome = i - ((i * percentDeduction) + fixedDeduction);
+                const testTax = testTaxableIncome * capitalGainTax;
+                const test = i - testTax;
+
+                if (test <= totalCost) {
+                    tenantRent = test == totalCost ? test : lastTest;
+                    break;
+                }
+
+                lastTest = i;
+            }
+
+
+            // Calculate Taxable Income
+            const taxableIncome = tenantRent - ((tenantRent * percentDeduction) + fixedDeduction);
+            // Calculate Capital Gains Tax
+            const tax = taxableIncome * capitalGainTax;
+
+            // Update the results in the HTML
+            deductedMortgageOutput.textContent = formatCurrency(deductedMortgage);
+            tenantRent1Output.textContent = formatCurrency(tenantRent1);
+            taxableIncomeOutput.textContent = formatCurrency(taxableIncome);
+            totalCostSpanOutput.textContent = formatCurrency(totalCost);
+            taxSpanOutput.textContent = formatCurrency(tax);
+            tenantRentSpanOutput.textContent = formatCurrency(tenantRent);
+        }
+
+        // Add event listeners to input fields to recalculate on change
+        const inputs = [
+            heatingInput, garbageInput, chimneyInput,
+            broadbandInput, renovationInput, mortgageInput,
+            insuranceInput, baseCostInput, fixedDeductionInput,
+            capitalGainTaxInput, percentDeductionInput, propertyTaxInput,
+            percentMortgageDeductionInput, propertyTaxInput, rentInput,
+            repaymentInput, loanInput
+        ];
+        inputs.forEach(input => {
+            input.addEventListener('input', calculate);
+        });
+
+        // Initial calculation
+        calculate();
+    </script>
+
+</body>
+
+</html>
