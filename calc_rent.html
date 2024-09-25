@@ -171,10 +171,6 @@
             <div class="card bg-base-200 shadow-xl p-6">
                 <h2 class="text-2xl font-bold mb-4">Calculation Results</h2>
                 <div class="grid grid-cols-2 gap-2">
-                    <p class="text-lg font-semibold">Property Tax Per Month</p>
-                    <p class="text-lg text-right" id="propertyTaxPerMonth">0</p>
-                    <p class="text-lg font-semibold">Mortgage (after Deduction)</p>
-                    <p class="text-lg text-right" id="deductedMortgage">0</p>
                     <p class="text-lg font-semibold">Total Cost (leaseholder)</p>
                     <p class="text-lg text-right" id="totalCost">0</p>
                     <p class="text-lg font-semibold">Tenant Rent (without tax deduction)</p>
@@ -220,17 +216,36 @@
         const percentDeductionInput = document.getElementById('percentDeduction');
         const percentMortgageDeductionInput = document.getElementById('percentMortgageDeduction');
 
-        const deductedMortgageOutput = document.getElementById('deductedMortgage');
         const tenantRent1Output = document.getElementById('tenantRent1');
         const taxableIncomeOutput = document.getElementById('taxableIncome');
         const totalCostSpanOutput = document.getElementById('totalCost');
         const taxSpanOutput = document.getElementById('tax');
         const tenantRentSpanOutput = document.getElementById('tenantRent');
-        const propertyTaxPerMonthOutput = document.getElementById('propertyTaxPerMonth');
 
         // Function to format numbers as currency
         function formatCurrency(value) {
             return Number(value).toLocaleString('sv-SE', { style: 'currency', currency: 'SEK' });
+        }
+
+        // Function to numerically calculate the tenant rent
+        function calculateTenantRentNumerically(tenantRentStart, totalCost, percentDeduction, fixedDeduction, capitalGainTax, step) {
+            let tenantRent = tenantRentStart;
+            let lastTest = tenantRentStart;
+
+            for (let i = tenantRentStart; i > totalCost; i -= step) {
+                const testTaxableIncome = i - ((i * percentDeduction) + fixedDeduction);
+                const testTax = testTaxableIncome * capitalGainTax;
+                const test = i - testTax;
+
+                if (test <= totalCost) {
+                    tenantRent = test === totalCost ? i : lastTest;
+                    break;
+                }
+
+                lastTest = i;
+            }
+
+            return tenantRent;
         }
 
         // Function to calculate and update the results
@@ -281,22 +296,22 @@
             const tenantRent1 = totalCost / (1 - capitalGainTax);
 
             // Numerically calculate the tenant rent since tenantRent1 is overestimated
-            var tenantRent = tenantRent1;
-            var lastTest = tenantRent1;
+            let tenantRentEstimate = tenantRent1;
+            const steps = [100, 10, 1,0.1,0.01];
 
-            for (var i = tenantRent1; i > totalCost; i -= 100) {
-                const testTaxableIncome = i - ((i * percentDeduction) + fixedDeduction);
-                const testTax = testTaxableIncome * capitalGainTax;
-                const test = i - testTax;
+            steps.forEach(step => {
+                tenantRentEstimate = calculateTenantRentNumerically(
+                    tenantRentEstimate,
+                    totalCost,
+                    percentDeduction,
+                    fixedDeduction,
+                    capitalGainTax,
+                    step
+                );
+            });
 
-                if (test <= totalCost) {
-                    tenantRent = test == totalCost ? test : lastTest;
-                    break;
-                }
-
-                lastTest = i;
-            }
-
+            // Final estimate becomes the tenant rent
+            const tenantRent = tenantRentEstimate;
 
             // Calculate Taxable Income
             const taxableIncome = tenantRent - ((tenantRent * percentDeduction) + fixedDeduction);
@@ -304,8 +319,6 @@
             const tax = taxableIncome * capitalGainTax;
 
             // Update the results in the HTML
-            propertyTaxPerMonthOutput.textContent = formatCurrency(propertyTax);
-            deductedMortgageOutput.textContent = formatCurrency(deductedMortgage);
             tenantRent1Output.textContent = formatCurrency(tenantRent1);
             taxableIncomeOutput.textContent = formatCurrency(taxableIncome);
             totalCostSpanOutput.textContent = formatCurrency(totalCost);
@@ -333,7 +346,7 @@
             calculationDetails += '<h3>Step 3: Calculate Total Cost for Leaseholder</h3>';
             calculationDetails += `<p>$$\\begin{align*}
             \\text{Total Cost} &= \\text{Heating} + \\text{Garbage} + \\text{Chimney} + \\text{Broadband} \\\\
-            &\\quad + \\text{Base Cost} + \\text{Renovation} + \\text{Deducted Mortgage} \\\\
+            &\\quad + \\text{Extra Cost} + \\text{Renovation} + \\text{Deducted Mortgage} \\\\
             &\\quad + \\text{Repayment} + \\text{Insurance} + \\text{Property Tax}
             \\end{align*}$$</p>`;
             calculationDetails += `<p>$$\\begin{align*}
@@ -346,7 +359,7 @@
             calculationDetails += '<br>';
 
             // Step 4: Calculate Initial Tenant Rent Estimate
-            calculationDetails += '<h3>Step 4: Calculate Initial Tenant Rent Estimate</h3>';
+            calculationDetails += '<h3>Step 4: Calculate Initial Tenant Rent Estimate (overestimated)</h3>';
             calculationDetails += `<p>$$\\text{Tenant Rent}_1 = \\dfrac{\\text{Total Cost}}{1 - \\text{Capital Gains Tax}}$$</p>`;
             calculationDetails += `<p>$$\\text{Tenant Rent}_1 = \\dfrac{${totalCost.toFixed(2)}}{1 - ${capitalGainTax * 100}\\%} = ${tenantRent1.toFixed(2)}$$</p>`;
 
@@ -354,7 +367,7 @@
 
             // Step 5: Numerically Calculate Tenant Rent
             calculationDetails += '<h3>Step 5: Refine Tenant Rent Calculation</h3>';
-            calculationDetails += `<p>Using numerical methods to find Tenant Rent where:</p>`;
+            calculationDetails += `<p>Using numerical methods with decreasing step sizes to find Tenant Rent where:</p>`;
             calculationDetails += `<p>$$\\text{Tenant Rent} - \\text{Tax} = \\text{Total Cost}$$</p>`;
             calculationDetails += `<p>Final Tenant Rent: $$\\text{Tenant Rent} = ${tenantRent.toFixed(2)}$$</p>`;
 
@@ -378,7 +391,7 @@
             calculationDetails += '<h3>Step 8: Verify Total Cost</h3>';
             calculationDetails += `<p>$$\\text{Total Cost} = \\text{Tenant Rent} - \\text{Tax}$$</p>`;
             calculationDetails += `<p>$$\\text{Total Cost} = ${tenantRent.toFixed(2)} - ${tax.toFixed(2)} = ${(tenantRent - tax).toFixed(2)}$$</p>`;
-            calculationDetails += `<p>Verified Total Cost matches calculated Total Cost: ${totalCost.toFixed(2)}</p>`;
+            calculationDetails += `<p>Verified Total Cost approximately matches calculated Total Cost: ${totalCost.toFixed(2)}</p>`;
             
             document.getElementById('calculationDetails').innerHTML = calculationDetails;
             // Re-render MathJax content
