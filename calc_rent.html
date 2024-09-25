@@ -11,6 +11,19 @@
     <script src="https://unpkg.com/@popperjs/core@2"></script>
     <script src="https://unpkg.com/tippy.js@6"></script>
     <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/animations/scale.css" />
+    <script>
+        // Initialize Tippy.js
+        tippy('.info-icon', {
+            allowHTML: true,
+            interactive: true,
+            sticky: true,
+            animation: 'scale',
+            delay: [0, 100],
+            duration: [300, 300],
+            placement: 'right',
+            theme: 'light-border',
+        });
+   </script>
 </head>
 
 <body class="p-6">
@@ -345,11 +358,11 @@
             var capitalGainTax = parseFloat(capitalGainTaxInput.value) || 0;
             var percentDeduction = parseFloat(percentDeductionInput.value) || 0;
             var percentMortgageDeduction = parseFloat(percentMortgageDeductionInput.value) || 0;
+            var fixedDeduction = fixedDeductionAnnual > 0 ? fixedDeductionAnnual / 12 : 0;
 
             // Ensure values are properly formatted
             propertyTax = propertyTax > 0 ? propertyTax / 12 : 0;
             percentMortgageDeduction = percentMortgageDeduction > 0 ? percentMortgageDeduction / 100 : 0;
-            fixedDeduction = fixedDeductionAnnual > 0 ? fixedDeductionAnnual / 12 : 0;
             percentDeduction = percentDeduction > 0 ? percentDeduction / 100 : 0;
             capitalGainTax = capitalGainTax > 0 ? capitalGainTax / 100 : 0;
 
@@ -481,28 +494,6 @@
 
         // Initial calculation
         calculate();
-    </script>
-    <script>
-        // Initialize Tippy.js
-        tippy('.info-icon', {
-            allowHTML: true,
-            interactive: true,
-            sticky: true,
-            animation: 'scale',
-            delay: [0, 100],
-            duration: [300, 300],
-            placement: 'right',
-            theme: 'light-border',
-        });
-        // Initialize MathJax
-        window.MathJax = {
-            tex: {
-                inlineMath: [['$', '$'], ['\\(', '\\)']]
-            },
-            svg: {
-                fontCache: 'global'
-            }
-        };
     </script>
     <svg style="display: none;">
         <symbol id="info-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
