@@ -186,10 +186,17 @@
                     <p class="text-lg text-right font-bold" id="tenantRent">0</p>
                 </div>
             </div>
-            <!-- Calculation Details Card -->
+            <!-- Calculation Details -->
             <div class="card bg-base-200 shadow-xl p-6 mt-8">
                 <h2 class="text-2xl font-bold mb-4">Calculation Details</h2>
                 <div id="calculationDetails" class="prose"></div>
+            </div>
+            <!-- Disclaimer -->
+            <div class="card bg-yellow-200 shadow-xl p-6 mt-8">
+                <h2 class="text-2xl font-bold mb-4">Disclaimer</h2>
+                <p class="text-md">
+                    The results provided by this calculator are for informational purposes only and should not be considered legal, financial, or tax advice. No responsibility is taken for the correctness of the calculations. Use of this calculator is at your own risk.
+                </p>
             </div>
         </div>
     </div>
@@ -273,7 +280,7 @@
 
             // Fixed Deduction
             let propertyTax = parseFloat(propertyTaxInput.value) || 0;
-            var fixedDeduction = parseFloat(fixedDeductionInput.value) || 0;
+            var fixedDeductionAnnual = parseFloat(fixedDeductionInput.value) || 0;
             var capitalGainTax = parseFloat(capitalGainTaxInput.value) || 0;
             var percentDeduction = parseFloat(percentDeductionInput.value) || 0;
             var percentMortgageDeduction = parseFloat(percentMortgageDeductionInput.value) || 0;
@@ -281,7 +288,7 @@
             // Ensure values are properly formatted
             propertyTax = propertyTax > 0 ? propertyTax / 12 : 0;
             percentMortgageDeduction = percentMortgageDeduction > 0 ? percentMortgageDeduction / 100 : 0;
-            fixedDeduction = fixedDeduction > 0 ? fixedDeduction / 12 : 0;
+            fixedDeduction = fixedDeduction > 0 ? fixedDeductionAnnual / 12 : 0;
             percentDeduction = percentDeduction > 0 ? percentDeduction / 100 : 0;
             capitalGainTax = capitalGainTax > 0 ? capitalGainTax / 100 : 0;
 
@@ -375,9 +382,8 @@
 
             // Step 6: Calculate Taxable Income
             calculationDetails += '<h3>Step 6: Calculate Taxable Income</h3>';
-            calculationDetails += `<p>$$\\text{Taxable Income} = \\text{Tenant Rent} - \\left( \\text{Tenant Rent} \\times \\text{Percent Deduction} + \\text{Fixed Deduction} \\right)$$</p>`;
-            calculationDetails += `<p>$$\\text{Taxable Income} = ${tenantRent.toFixed(2)} - \\left( ${tenantRent.toFixed(2)} \\times ${percentDeduction * 100}\\% + ${fixedDeduction.toFixed(2)} \\right) = ${taxableIncome.toFixed(2)}$$</p>`;
-
+calculationDetails += `<p>$$\\text{Taxable Income} = \\text{Tenant Rent} - \\left( \\text{Tenant Rent} \\times \\text{Percent Deduction} + \\dfrac{\\text{Fixed Deduction}}{12} \\right)$$</p>`;
+calculationDetails += `<p>$$\\text{Taxable Income} = ${tenantRent.toFixed(2)} - \\left( ${tenantRent.toFixed(2)} \\times ${percentDeduction * 100}\\% + \\dfrac{${fixedDeductionAnnual.toFixed(2)}}{12} \\right) = ${taxableIncome.toFixed(2)}$$</p>`;
             calculationDetails += '<br>';
 
             // Step 7: Calculate Tax
@@ -388,10 +394,10 @@
             calculationDetails += '<br>';
 
             // Step 8: Verify Total Cost
-            calculationDetails += '<h3>Step 8: Verify Total Cost</h3>';
+            calculationDetails += '<h3>Step 8: Verify Total Cost (leaseholder)</h3>';
             calculationDetails += `<p>$$\\text{Total Cost} = \\text{Tenant Rent} - \\text{Tax}$$</p>`;
             calculationDetails += `<p>$$\\text{Total Cost} = ${tenantRent.toFixed(2)} - ${tax.toFixed(2)} = ${(tenantRent - tax).toFixed(2)}$$</p>`;
-            calculationDetails += `<p>Verified Total Cost approximately matches calculated Total Cost: ${totalCost.toFixed(2)}</p>`;
+            calculationDetails += `<p><b>Verified Total Cost approximately matches calculated Total Cost: ${totalCost.toFixed(2)}<b></p>`;
             
             document.getElementById('calculationDetails').innerHTML = calculationDetails;
             // Re-render MathJax content
