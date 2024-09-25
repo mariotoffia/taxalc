@@ -6,18 +6,13 @@
     <title>Tenant Rent Calculator</title>
     <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        window.MathJax = {
-          tex: {
-            inlineMath: [['$', '$'], ['\\(', '\\)']]
-          },
-          svg: {
-            fontCache: 'global'
-          }
-        };
-      </script>
-      <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+
+    <script src="https://unpkg.com/@popperjs/core@2"></script>
+    <script src="https://unpkg.com/tippy.js@6"></script>
+    <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/animations/scale.css" />
 </head>
+
 <body class="p-6">
     <h1 class="text-3xl font-bold text-center mb-8">Tenant Rent Calculator</h1>
     <div class="flex flex-col md:flex-row">
@@ -29,6 +24,10 @@
                 <div class="form-control mb-4">
                     <label class="label" for="heating">
                         <span class="label-text">Electricity & Heating</span>
+                        <svg class="info-icon inline-block w-4 h-4 ml-1 cursor-pointer text-blue-500"
+                            data-tippy-content='Enter the monthly cost for electricity and heating.'>
+                            <use href="#info-icon"></use>
+                        </svg>
                     </label>
                     <input type="number" id="heating" value="3200" min="0" step="any"
                         class="input input-bordered w-full">
@@ -37,6 +36,10 @@
                 <div class="form-control mb-4">
                     <label class="label" for="garbage">
                         <span class="label-text">Garbage and Water</span>
+                        <svg class="info-icon inline-block w-4 h-4 ml-1 cursor-pointer text-blue-500"
+                            data-tippy-content='Enter the monthly cost for garbage collection and water services. These are the payments to tekniska kontoret.'>
+                            <use href="#info-icon"></use>
+                        </svg>
                     </label>
                     <input type="number" id="garbage" value="1800" min="0" step="any"
                         class="input input-bordered w-full">
@@ -45,6 +48,10 @@
                 <div class="form-control mb-4">
                     <label class="label" for="chimney">
                         <span class="label-text">Chimney Sweeping</span>
+                        <svg class="info-icon inline-block w-4 h-4 ml-1 cursor-pointer text-blue-500"
+                            data-tippy-content='Enter the monthly cost for chimney sweeping.'>
+                            <use href="#info-icon"></use>
+                        </svg>
                     </label>
                     <input type="number" id="chimney" value="200" min="0" step="any"
                         class="input input-bordered w-full">
@@ -53,14 +60,22 @@
                 <div class="form-control mb-4">
                     <label class="label" for="broadband">
                         <span class="label-text">Broadband</span>
+                        <svg class="info-icon inline-block w-4 h-4 ml-1 cursor-pointer text-blue-500"
+                            data-tippy-content='Enter the monthly cost for broadband/internet services provided to the tenant. Include some costs of the equipment as monthly cost.'>
+                            <use href="#info-icon"></use>
+                        </svg>
                     </label>
                     <input type="number" id="broadband" value="350" min="0" step="any"
                         class="input input-bordered w-full">
                 </div>
-                <!-- Renovating Budget -->
+                <!-- Repairs & Maintenance -->
                 <div class="form-control mb-4">
                     <label class="label" for="renovation">
-                        <span class="label-text">Renovating Budget</span>
+                        <span class="label-text">Repairs & Maintenance</span>
+                        <svg class="info-icon inline-block w-4 h-4 ml-1 cursor-pointer text-blue-500"
+                            data-tippy-content='Enter the monthly amount you set aside for repairs and maintenance. Make sure to also include things like a fridge etc. that needs repair or replacement in the calculation.'>
+                            <use href="#info-icon"></use>
+                        </svg>
                     </label>
                     <input type="number" id="renovation" value="2000" min="0" step="any"
                         class="input input-bordered w-full">
@@ -69,6 +84,10 @@
                 <div class="form-control mb-4">
                     <label class="label" for="insurance">
                         <span class="label-text">Insurance</span>
+                        <svg class="info-icon inline-block w-4 h-4 ml-1 cursor-pointer text-blue-500"
+                            data-tippy-content='Enter the monthly cost of insurance related to the property.<br/><b>TIP: Make sure that the tenant has a insurance as well!</b><br/><a href="https://www.lansforsakringar.se/vasterbotten/privat/forsakring/hemforsakring/andrahandsuthyrning/" target="_blank">Home Insurance</a>'>
+                            <use href="#info-icon"></use>
+                        </svg>
                     </label>
                     <input type="number" id="insurance" value="1000" min="0" step="any"
                         class="input input-bordered w-full">
@@ -77,6 +96,10 @@
                 <div class="form-control mb-4">
                     <label class="label" for="baseCost">
                         <span class="label-text">Extra Costs</span>
+                        <svg class="info-icon inline-block w-4 h-4 ml-1 cursor-pointer text-blue-500"
+                            data-tippy-content='Enter any additional monthly costs not covered in the other fields.'>
+                            <use href="#info-icon"></use>
+                        </svg>
                     </label>
                     <input type="number" id="baseCost" value="0" min="0" step="any" class="input input-bordered w-full">
                 </div>
@@ -89,6 +112,10 @@
                 <div class="form-control mb-4">
                     <label class="label" for="loan">
                         <span class="label-text">Loan</span>
+                        <svg class="info-icon inline-block w-4 h-4 ml-1 cursor-pointer text-blue-500"
+                            data-tippy-content='Enter the total loan amount for the property.<br/>If you want to enter the mortgage manually, keep this field as <em>zero</em>'>
+                            <use href="#info-icon"></use>
+                        </svg>
                     </label>
                     <input type="number" id="loan" value="2800000" min="0" step="any"
                         class="input input-bordered w-full">
@@ -97,13 +124,21 @@
                 <div class="form-control mb-4">
                     <label class="label" for="rent">
                         <span class="label-text">Rent (%)</span>
+                        <svg class="info-icon inline-block w-4 h-4 ml-1 cursor-pointer text-blue-500"
+                            data-tippy-content='Enter the annual interest rate (%) on your loan.<br/>If you want to enter the mortgage manually, keep this field as <em>zero</em>'>
+                            <use href="#info-icon"></use>
+                        </svg>
                     </label>
                     <input type="number" id="rent" value="3.57" min="0" step="any" class="input input-bordered w-full">
                 </div>
                 <!-- Principal Repayment (Per Month) -->
                 <div class="form-control mb-4">
                     <label class="label" for="repayment">
-                        <span class="label-text">Principal repayment</span>
+                        <span class="label-text">Principal Repayment (Monthly)</span>
+                        <svg class="info-icon inline-block w-4 h-4 ml-1 cursor-pointer text-blue-500"
+                            data-tippy-content='Enter the monthly amount you repay on the loan principal (monthly)<br/>If you want to enter the mortgage manually, keep this field as <em>zero</em>'>
+                            <use href="#info-icon"></use>
+                        </svg>
                     </label>
                     <input type="number" id="repayment" value="0" min="0" step="any"
                         class="input input-bordered w-full">
@@ -114,7 +149,11 @@
                 <!-- Mortgage (Per Month) -->
                 <div class="form-control mb-4">
                     <label class="label" for="mortgage">
-                        <span class="label-text">Mortgage (Per Month)</span>
+                        <span class="label-text">Mortgage (Monthly)</span>
+                        <svg class="info-icon inline-block w-4 h-4 ml-1 cursor-pointer text-blue-500"
+                            data-tippy-content='This field is calculated automatically based on Loan and Rent (%). It represents your monthly interest payment. Set loan & rent to zero to edit this field manually!'>
+                            <use href="#info-icon"></use>
+                        </svg>
                     </label>
                     <input type="number" id="mortgage" value="0" min="0" step="any" class="input input-bordered w-full">
                 </div>
@@ -127,6 +166,10 @@
                 <div class="form-control mb-4">
                     <label class="label" for="propertyTax">
                         <span class="label-text">Property Tax (Yearly)</span>
+                        <svg class="info-icon inline-block w-4 h-4 ml-1 cursor-pointer text-blue-500"
+                            data-tippy-content='Enter the annual property tax for your property.<br/><a href="https://skatteverket.se/privat/fastigheterochbostad/fastighetsavgiftochfastighetsskatt" target="_blank">Skatteverket - Property tax and fee</a>'>
+                            <use href="#info-icon"></use>
+                        </svg>
                     </label>
                     <input type="number" id="propertyTax" value="9600" min="0" step="any"
                         class="input input-bordered w-full">
@@ -135,6 +178,10 @@
                 <div class="form-control mb-4">
                     <label class="label" for="fixedDeduction">
                         <span class="label-text">Fixed Deduction (Yearly)</span>
+                        <svg class="info-icon inline-block w-4 h-4 ml-1 cursor-pointer text-blue-500"
+                            data-tippy-content='This is the fixed annual deduction you can make when renting out property (e.g., 40,000 SEK per year).<br/><a href="https://www.skatteverket.se/privat/fastigheterochbostad/hyrautprivatbostad" target="_blank">Skatteverket - Deductions when renting out property</a>'>
+                            <use href="#info-icon"></use>
+                        </svg>
                     </label>
                     <input type="number" id="fixedDeduction" value="40000" min="0" step="any"
                         class="input input-bordered w-full">
@@ -143,6 +190,10 @@
                 <div class="form-control mb-4">
                     <label class="label" for="percentDeduction">
                         <span class="label-text">Percent Deduction (%)</span>
+                        <svg class="info-icon inline-block w-4 h-4 ml-1 cursor-pointer text-blue-500"
+                            data-tippy-content='Enter the percentage of rental income you can deduct for wear and tear (e.g., 20%).<br/><a href="https://www.skatteverket.se/privat/fastigheterochbostad/hyrautprivatbostad" target="_blank">Skatteverket - Deductions when renting out property</a>'>
+                            <use href="#info-icon"></use>
+                        </svg>
                     </label>
                     <input type="number" id="percentDeduction" value="20" min="0" step="any"
                         class="input input-bordered w-full">
@@ -151,6 +202,10 @@
                 <div class="form-control mb-4">
                     <label class="label" for="percentMortgageDeduction">
                         <span class="label-text">Percent Mortgage Deduction (%)</span>
+                        <svg class="info-icon inline-block w-4 h-4 ml-1 cursor-pointer text-blue-500"
+                            data-tippy-content='Enter the percentage of mortgage interest that is tax-deductible (e.g., 30%).<br/><a href="https://www.skatteverket.se/privat/deklaration/avdragforranteutgifter" target="_blank">Skatteverket - Interest deductions</a>'>
+                            <use href="#info-icon"></use>
+                        </svg>
                     </label>
                     <input type="number" id="percentMortgageDeduction" value="30" min="0" step="any"
                         class="input input-bordered w-full">
@@ -159,6 +214,10 @@
                 <div class="form-control mb-4">
                     <label class="label" for="capitalGainTax">
                         <span class="label-text">Capital Gains Tax (%)</span>
+                        <svg class="info-icon inline-block w-4 h-4 ml-1 cursor-pointer text-blue-500"
+                            data-tippy-content='Enter the capital gains tax rate (usually 30%).<br/><a href="https://www4.skatteverket.se/rattsligvagledning/edition/2024.4/2714.html" target="_blank">Skatteverket - Rental income taxation</a>'>
+                            <use href="#info-icon"></use>
+                        </svg>
                     </label>
                     <input type="number" id="capitalGainTax" value="30" min="0" step="any"
                         class="input input-bordered w-full">
@@ -195,7 +254,9 @@
             <div class="card bg-yellow-200 shadow-xl p-6 mt-8">
                 <h2 class="text-2xl font-bold mb-4">Disclaimer</h2>
                 <p class="text-md">
-                    The results provided by this calculator are for informational purposes only and should not be considered legal, financial, or tax advice. No responsibility is taken for the correctness of the calculations. Use of this calculator is at your own risk.
+                    The results provided by this calculator are for informational purposes only and should not be
+                    considered legal, financial, or tax advice. No responsibility is taken for the correctness of the
+                    calculations. Use of this calculator is at your own risk.
                 </p>
             </div>
         </div>
@@ -273,8 +334,8 @@
             var mortgage = parseFloat(mortgageInput.value) || 0;
 
             if (loan > 0 && rent > 0) {
-                mortgage =  ((loan/12) * (rent / 100)).toFixed();
-                // Update the inout field with the calculated mortgage
+                mortgage = ((loan / 12) * (rent / 100)).toFixed();
+                // Update the input field with the calculated mortgage
                 mortgageInput.value = mortgage;
             }
 
@@ -288,7 +349,7 @@
             // Ensure values are properly formatted
             propertyTax = propertyTax > 0 ? propertyTax / 12 : 0;
             percentMortgageDeduction = percentMortgageDeduction > 0 ? percentMortgageDeduction / 100 : 0;
-            fixedDeduction = fixedDeduction > 0 ? fixedDeductionAnnual / 12 : 0;
+            fixedDeduction = fixedDeductionAnnual > 0 ? fixedDeductionAnnual / 12 : 0;
             percentDeduction = percentDeduction > 0 ? percentDeduction / 100 : 0;
             capitalGainTax = capitalGainTax > 0 ? capitalGainTax / 100 : 0;
 
@@ -304,7 +365,7 @@
 
             // Numerically calculate the tenant rent since tenantRent1 is overestimated
             let tenantRentEstimate = tenantRent1;
-            const steps = [100, 10, 1,0.1,0.01];
+            const steps = [100, 10, 1, 0.1, 0.01];
 
             steps.forEach(step => {
                 tenantRentEstimate = calculateTenantRentNumerically(
@@ -331,13 +392,13 @@
             totalCostSpanOutput.textContent = formatCurrency(totalCost);
             taxSpanOutput.textContent = formatCurrency(tax);
             tenantRentSpanOutput.textContent = formatCurrency(tenantRent);
-            
+
             // Calculation Details
             let calculationDetails = '';
 
             // Step 1: Calculate Mortgage
             calculationDetails += '<h3>Step 1: Calculate Mortgage</h3>';
-            calculationDetails += `<p>$$\\text{Mortgage} = \\left( \\dfrac{\\text{Loan}}{12} \\right) \\times \\left( \\dfrac{\\text{Rent Rate}}{100} \\right)$$</p>`;
+            calculationDetails += `<p>$$\\text{Mortgage} = \\left( \\dfrac{\\text{Loan}}{12} \\right) \\times \\left( \\dfrac{\\text{Interest Rate}}{100} \\right)$$</p>`;
             calculationDetails += `<p>$$\\text{Mortgage} = \\left( \\dfrac{${loan}}{12} \\right) \\times \\left( \\dfrac{${rent}}{100} \\right) = ${parseFloat(mortgage).toFixed(2)}$$</p>`;
 
             calculationDetails += '<br>';
@@ -382,8 +443,9 @@
 
             // Step 6: Calculate Taxable Income
             calculationDetails += '<h3>Step 6: Calculate Taxable Income</h3>';
-calculationDetails += `<p>$$\\text{Taxable Income} = \\text{Tenant Rent} - \\left( \\text{Tenant Rent} \\times \\text{Percent Deduction} + \\dfrac{\\text{Fixed Deduction}}{12} \\right)$$</p>`;
-calculationDetails += `<p>$$\\text{Taxable Income} = ${tenantRent.toFixed(2)} - \\left( ${tenantRent.toFixed(2)} \\times ${percentDeduction * 100}\\% + \\dfrac{${fixedDeductionAnnual.toFixed(2)}}{12} \\right) = ${taxableIncome.toFixed(2)}$$</p>`;
+            calculationDetails += `<p>$$\\text{Taxable Income} = \\text{Tenant Rent} - \\left( \\text{Tenant Rent} \\times \\text{Percent Deduction} + \\dfrac{\\text{Fixed Deduction}}{12} \\right)$$</p>`;
+            calculationDetails += `<p>$$\\text{Taxable Income} = ${tenantRent.toFixed(2)} - \\left( ${tenantRent.toFixed(2)} \\times ${percentDeduction * 100}\\% + \\dfrac{${fixedDeductionAnnual.toFixed(2)}}{12} \\right) = ${taxableIncome.toFixed(2)}$$</p>`;
+
             calculationDetails += '<br>';
 
             // Step 7: Calculate Tax
@@ -397,8 +459,8 @@ calculationDetails += `<p>$$\\text{Taxable Income} = ${tenantRent.toFixed(2)} - 
             calculationDetails += '<h3>Step 8: Verify Total Cost (leaseholder)</h3>';
             calculationDetails += `<p>$$\\text{Total Cost} = \\text{Tenant Rent} - \\text{Tax}$$</p>`;
             calculationDetails += `<p>$$\\text{Total Cost} = ${tenantRent.toFixed(2)} - ${tax.toFixed(2)} = ${(tenantRent - tax).toFixed(2)}$$</p>`;
-            calculationDetails += `<p><b>Verified Total Cost approximately matches calculated Total Cost: ${totalCost.toFixed(2)}<b></p>`;
-            
+            calculationDetails += `<p><b>Verified Total Cost approximately matches calculated Total Cost: ${totalCost.toFixed(2)}</b></p>`;
+
             document.getElementById('calculationDetails').innerHTML = calculationDetails;
             // Re-render MathJax content
             MathJax.typesetPromise();
@@ -420,7 +482,37 @@ calculationDetails += `<p>$$\\text{Taxable Income} = ${tenantRent.toFixed(2)} - 
         // Initial calculation
         calculate();
     </script>
-
+    <script>
+        // Initialize Tippy.js
+        tippy('.info-icon', {
+            allowHTML: true,
+            interactive: true,
+            sticky: true,
+            animation: 'scale',
+            delay: [0, 100],
+            duration: [300, 300],
+            placement: 'right',
+            theme: 'light-border',
+        });
+        // Initialize MathJax
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <svg style="display: none;">
+        <symbol id="info-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+            class="icon icon-info w-8 h-8 text-yellow-500 mr-2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="16" x2="12" y2="12"></line>
+            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+        </symbol>
+    </svg>
 </body>
 
 </html>
