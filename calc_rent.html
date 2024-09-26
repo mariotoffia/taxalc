@@ -42,7 +42,7 @@
                             <use href="#info-icon"></use>
                         </svg>
                     </label>
-                    <input type="number" id="heating" value="3200" min="0" step="any"
+                    <input type="number" id="heating" value="0" min="0" step="any"
                         class="input input-bordered w-full">
                 </div>
                 <!-- Garbage and Water -->
@@ -54,7 +54,7 @@
                             <use href="#info-icon"></use>
                         </svg>
                     </label>
-                    <input type="number" id="garbage" value="1800" min="0" step="any"
+                    <input type="number" id="garbage" value="0" min="0" step="any"
                         class="input input-bordered w-full">
                 </div>
                 <!-- Chimney Sweeping -->
@@ -66,7 +66,7 @@
                             <use href="#info-icon"></use>
                         </svg>
                     </label>
-                    <input type="number" id="chimney" value="200" min="0" step="any"
+                    <input type="number" id="chimney" value="0" min="0" step="any"
                         class="input input-bordered w-full">
                 </div>
                 <!-- Broadband -->
@@ -78,7 +78,7 @@
                             <use href="#info-icon"></use>
                         </svg>
                     </label>
-                    <input type="number" id="broadband" value="350" min="0" step="any"
+                    <input type="number" id="broadband" value="0" min="0" step="any"
                         class="input input-bordered w-full">
                 </div>
                 <!-- Repairs & Maintenance -->
@@ -90,7 +90,7 @@
                             <use href="#info-icon"></use>
                         </svg>
                     </label>
-                    <input type="number" id="renovation" value="2000" min="0" step="any"
+                    <input type="number" id="renovation" value="0" min="0" step="any"
                         class="input input-bordered w-full">
                 </div>
                 <!-- Insurance -->
@@ -102,7 +102,7 @@
                             <use href="#info-icon"></use>
                         </svg>
                     </label>
-                    <input type="number" id="insurance" value="1000" min="0" step="any"
+                    <input type="number" id="insurance" value="0" min="0" step="any"
                         class="input input-bordered w-full">
                 </div>
                 <!-- Extra Costs -->
@@ -114,7 +114,7 @@
                             <use href="#info-icon"></use>
                         </svg>
                     </label>
-                    <input type="number" id="baseCost" value="0" min="0" step="any" class="input input-bordered w-full">
+                    <input type="number" id="baseCost" value="3333" min="0" step="any" class="input input-bordered w-full">
                 </div>
             </div>
             <br><br>
@@ -130,7 +130,7 @@
                             <use href="#info-icon"></use>
                         </svg>
                     </label>
-                    <input type="number" id="loan" value="2800000" min="0" step="any"
+                    <input type="number" id="loan" value="0" min="0" step="any"
                         class="input input-bordered w-full">
                 </div>
                 <!-- Rent -->
@@ -142,7 +142,7 @@
                             <use href="#info-icon"></use>
                         </svg>
                     </label>
-                    <input type="number" id="rent" value="3.57" min="0" step="any" class="input input-bordered w-full">
+                    <input type="number" id="rent" value="0" min="0" step="any" class="input input-bordered w-full">
                 </div>
                 <!-- Principal Repayment (Per Month) -->
                 <div class="form-control mb-4">
@@ -184,7 +184,7 @@
                             <use href="#info-icon"></use>
                         </svg>
                     </label>
-                    <input type="number" id="propertyTax" value="9600" min="0" step="any"
+                    <input type="number" id="propertyTax" value="0" min="0" step="any"
                         class="input input-bordered w-full">
                 </div>
                 <!-- Fixed Deduction (Yearly) -->
@@ -204,7 +204,7 @@
                     <label class="label" for="percentDeduction">
                         <span class="label-text">Percent Deduction (%)</span>
                         <svg class="info-icon inline-block w-4 h-4 ml-1 cursor-pointer text-blue-500"
-                            data-tippy-content='Enter the percentage of rental income you can deduct for wear and tear (e.g., 20%).<br/><a href="https://www.skatteverket.se/privat/fastigheterochbostad/hyrautprivatbostad" target="_blank">Skatteverket - Deductions when renting out property</a>'>
+                            data-tippy-content='Enter the percentage of rental income you can deduct for wear and tear (e.g., 20%).<br/><a href="https://www.skatteverket.se/privat/fastigheterochbostad/hyrautprivatbostad" target="_blank">Skatteverket - Deductions when renting out property</a><br/><a href="https://skatteverket.se/privat/etjansterochblanketter/blanketterbroschyrer/blanketter/info/2199.4.19b9f599116a9e8ef3680002386.html" target="_blank">Skatteverket blankett för uthyrning</a>'>
                             <use href="#info-icon"></use>
                         </svg>
                     </label>
@@ -310,6 +310,10 @@
 
         // Function to numerically calculate the tenant rent
         function calculateTenantRentNumerically(tenantRentStart, totalCost, percentDeduction, fixedDeduction, capitalGainTax, step) {
+            if (totalCost <= (fixedDeduction + (tenantRentStart * percentDeduction))) {
+                return totalCost;
+            }
+
             let tenantRent = tenantRentStart;
             let lastTest = tenantRentStart;
 
@@ -326,7 +330,7 @@
                 lastTest = i;
             }
 
-            return tenantRent;
+            return tenantRent || 0;
         }
 
         // Function to calculate and update the results
@@ -375,8 +379,9 @@
 
             // Tenant Rent #1
             const tenantRent1 = totalCost / (1 - capitalGainTax);
+            
 
-            // Numerically calculate the tenant rent since tenantRent1 is overestimated
+            // Numerically calculate the tenant rent since tenantRent1 is overestimated            
             let tenantRentEstimate = tenantRent1;
             const steps = [100, 10, 1, 0.1, 0.01];
 
@@ -395,7 +400,13 @@
             const tenantRent = tenantRentEstimate;
 
             // Calculate Taxable Income
-            const taxableIncome = tenantRent - ((tenantRent * percentDeduction) + fixedDeduction);
+            let taxableIncome = tenantRent - ((tenantRent * percentDeduction) + fixedDeduction);
+
+            if (taxableIncome < 0) {
+                // If taxable income is negative, set it to zero
+                taxableIncome = 0;
+            }
+
             // Calculate Capital Gains Tax
             const tax = taxableIncome * capitalGainTax;
 
