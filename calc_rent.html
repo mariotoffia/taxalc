@@ -4,21 +4,31 @@
 <head>
     <meta charset="UTF-8">
     <title>Tenant Rent Calculator</title>
-    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
     <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
 
     <script src="https://unpkg.com/@popperjs/core@2"></script>
     <script src="https://unpkg.com/tippy.js@6"></script>
     <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/animations/scale.css" />
+    <style>
+        /* Fade shareMessage */
+        .fade-out {
+            opacity: 0;
+            transition: opacity 1.5s ease-out;
+        }
+    </style>
 </head>
 
 <body class="p-6">
     <!-- Share Button -->
-    <button class="absolute top-6 right-6 text-white-500 p-2 rounded-full shadow-lg hover:bg-primary-focus" onClick="shareLink()">
+    <div id="shareMessage" class="absolute top-6 right-20 bg-gray-700 text-white px-4 py-2 rounded-md shadow-lg hidden">
+    </div>
+    <button class="absolute top-6 right-6 text-white-500 p-2 rounded-full shadow-lg hover:bg-primary-focus"
+        onClick="shareLink()">
         <!-- SVG for share icon -->
         <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M17 11l-5-5-5 5h3v4h4v-4h3zm0 10H7v-2h10v2z"/>
+            <path d="M17 11l-5-5-5 5h3v4h4v-4h3zm0 10H7v-2h10v2z" />
         </svg>
     </button>
     <h1 class="text-3xl font-bold text-center mb-8">Tenant Rent Calculator</h1>
@@ -530,9 +540,16 @@
         // Use the Web Share API to share the link (if supported)
         // If not supported, copy the link to the clipboard
         function shareLink() {
-            const shareableLink = generateLink();            
+            const shareableLink = generateLink();
 
-            if (navigator.share && !window.location.protocol === 'file:') {
+            // Reference to the message div
+            const shareMessage = document.getElementById('shareMessage');
+
+            // Reset message styles
+            shareMessage.classList.remove('fade-out');
+            shareMessage.classList.add('hidden');
+
+            if (navigator.share && window.location.protocol !== 'file:') {
                 navigator.share({
                     title: 'Tenant Rent Calculator',
                     text: 'Check out the calculated rent details using this link:',
@@ -543,15 +560,42 @@
                     })
                     .catch((error) => {
                         console.error('Error sharing the link:', error);
+                        showMessage('Error sharing the link!', 'error');
                     });
             } else {
                 // Fallback: Copy the link to clipboard if the Web Share API is not supported
                 navigator.clipboard.writeText(shareableLink).then(() => {
-                    alert('Shareable link copied to clipboard!');
+                    showMessage('Link copied to clipboard!', 'success');
                 }).catch(err => {
                     console.error('Failed to copy text: ', err);
+                    showMessage('Error copying the link!', 'error');
                 });
             }
+        }
+
+        function showMessage(message, type) {
+            const shareMessage = document.getElementById('shareMessage');
+            shareMessage.textContent = message;
+            shareMessage.classList.remove('hidden');
+
+            // Adjust message background color based on type
+            if (type === 'success') {
+                shareMessage.classList.remove('bg-red-700');
+                shareMessage.classList.add('bg-gray-700');
+            } else {
+                shareMessage.classList.remove('bg-gray-700');
+                shareMessage.classList.add('bg-red-700');
+            }
+
+            // Show the message, then fade out after 3 seconds
+            setTimeout(() => {
+                shareMessage.classList.add('fade-out');
+            }, 3000);
+
+            // Fully hide the message after 15 seconds (after fade-out completes)
+            setTimeout(() => {
+                shareMessage.classList.add('hidden');
+            }, 15000);
         }
 
         // Add event listeners to input fields to recalculate on change
