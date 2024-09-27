@@ -14,6 +14,13 @@
 </head>
 
 <body class="p-6">
+    <!-- Share Button -->
+    <button class="absolute top-6 right-6 text-white-500 p-2 rounded-full shadow-lg hover:bg-primary-focus" onClick="shareLink()">
+        <!-- SVG for share icon -->
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M17 11l-5-5-5 5h3v4h4v-4h3zm0 10H7v-2h10v2z"/>
+        </svg>
+    </button>
     <h1 class="text-3xl font-bold text-center mb-8">Tenant Rent Calculator</h1>
     <div class="flex flex-col md:flex-row">
         <!-- Input Section -->
@@ -366,7 +373,7 @@
 
             // Tenant Rent #1
             const tenantRent1 = totalCost / (1 - capitalGainTax);
-            
+
 
             // Numerically calculate the tenant rent since tenantRent1 is overestimated            
             let tenantRentEstimate = tenantRent1;
@@ -477,6 +484,76 @@
             MathJax.typesetPromise();
         }
 
+        function generateLink() {
+            const params = new URLSearchParams({
+                heating: heatingInput.value,
+                garbage: garbageInput.value,
+                chimney: chimneyInput.value,
+                broadband: broadbandInput.value,
+                renovation: renovationInput.value,
+                insurance: insuranceInput.value,
+                baseCost: baseCostInput.value,
+                loan: loanInput.value,
+                rent: rentInput.value,
+                repayment: repaymentInput.value,
+                mortgage: mortgageInput.value,
+                propertyTax: propertyTaxInput.value,
+                fixedDeduction: fixedDeductionInput.value,
+                capitalGainTax: capitalGainTaxInput.value,
+                percentDeduction: percentDeductionInput.value,
+                percentMortgageDeduction: percentMortgageDeductionInput.value
+            });
+
+            return `${window.location.origin}${window.location.pathname}?${params.toString()}`;
+        }
+
+        function fromURL(url) {
+            const params = new URLSearchParams(url);
+
+            heatingInput.value = params.get('heating') || 0;
+            garbageInput.value = params.get('garbage') || 0;
+            chimneyInput.value = params.get('chimney') || 0;
+            broadbandInput.value = params.get('broadband') || 0;
+            renovationInput.value = params.get('renovation') || 0;
+            insuranceInput.value = params.get('insurance') || 0;
+            baseCostInput.value = params.get('baseCost') || 0;
+            loanInput.value = params.get('loan') || 0;
+            rentInput.value = params.get('rent') || 0;
+            repaymentInput.value = params.get('repayment') || 0;
+            mortgageInput.value = params.get('mortgage') || 0;
+            propertyTaxInput.value = params.get('propertyTax') || 0;
+            fixedDeductionInput.value = params.get('fixedDeduction') || 0;
+            capitalGainTaxInput.value = params.get('capitalGainTax') || 0;
+            percentDeductionInput.value = params.get('percentDeduction') || 0;
+            percentMortgageDeductionInput.value = params.get('percentMortgageDeduction') || 0;
+        }
+        // Use the Web Share API to share the link (if supported)
+        // If not supported, copy the link to the clipboard
+        function shareLink() {
+            const shareableLink = generateLink();            
+
+            if (navigator.share && !window.location.protocol === 'file:') {
+                navigator.share({
+                    title: 'Tenant Rent Calculator',
+                    text: 'Check out the calculated rent details using this link:',
+                    url: shareableLink
+                })
+                    .then(() => {
+                        console.log('Link successfully shared');
+                    })
+                    .catch((error) => {
+                        console.error('Error sharing the link:', error);
+                    });
+            } else {
+                // Fallback: Copy the link to clipboard if the Web Share API is not supported
+                navigator.clipboard.writeText(shareableLink).then(() => {
+                    alert('Shareable link copied to clipboard!');
+                }).catch(err => {
+                    console.error('Failed to copy text: ', err);
+                });
+            }
+        }
+
         // Add event listeners to input fields to recalculate on change
         const inputs = [
             heatingInput, garbageInput, chimneyInput,
@@ -486,10 +563,10 @@
             percentMortgageDeductionInput, propertyTaxInput, rentInput,
             repaymentInput, loanInput
         ];
+        // Attach event listeners to do recalculation every time a user enters a value
         inputs.forEach(input => {
             input.addEventListener('input', calculate);
         });
-
         // Initialize Tippy.js
         tippy('.info-icon', {
             allowHTML: true,
@@ -501,7 +578,11 @@
             placement: 'right',
             theme: 'light-border',
         });
-
+        // If the URL contains query parameters, load them into the form
+        // and then calculate (otherwise use the defaults).
+        if (window.location.search) {
+            fromURL(window.location.search);
+        }
         // Initial calculation
         calculate();        
     </script>
@@ -515,4 +596,5 @@
         </symbol>
     </svg>
 </body>
+
 </html>
