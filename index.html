@@ -1,13 +1,27 @@
-<head><title>Main Pages</title></head>
-<body>
-  <h2>Calc Rent</h2>
-  <p>
-    This is a simple calculator for calculating the rent for a tenant.
-  </p>
-  <em>
-    Disclaimer! I do not take responsibility of the correctness of the calculations. 
-    Lookup for your self the correct values and formulas.
-  </em>
-  <br>
-  <a href="calc_rent.html">Calc Rent for Tenant (Swedish Tax)</a>
-</body
+<!DOCTYPE html>
+<html lang="sv" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <title>Skattekalkylator — Uthyrning av privatbostad</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
+</head>
+<body class="p-6 flex justify-center">
+    <div class="max-w-lg mt-12">
+        <h1 class="text-3xl font-bold text-center mb-6">Skattekalkylator</h1>
+        <p class="text-center text-lg mb-2">Uthyrning av privatbostad (småhus)</p>
+        <p class="text-center opacity-70 mb-8">Beräkna hyra och generera deklarationsunderlag enligt svenska skatteregler.</p>
+
+        <div class="flex flex-col gap-4">
+            <a href="kalkylator.html" class="btn btn-primary btn-lg w-full">Beräkna hyra</a>
+            <a href="deklaration.html" class="btn btn-secondary btn-lg w-full">Deklarationsunderlag</a>
+        </div>
+
+        <div class="card bg-yellow-200 text-black shadow-xl p-4 mt-8">
+            <p class="text-sm">
+                <strong>Ansvarsfriskrivning:</strong> Resultaten är enbart i informationssyfte och ska inte betraktas som skatterådgivning. Kontrollera alltid mot Skatteverkets aktuella regler. Användning sker på egen risk.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

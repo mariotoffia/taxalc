@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="sv" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <title>Hyresberäkning — Uthyrning av privatbostad</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+    <script src="https://unpkg.com/@popperjs/core@2"></script>
+    <script src="https://unpkg.com/tippy.js@6"></script>
+    <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/animations/scale.css" />
+    <script src="js/taxcalc-core.js"></script>
+    <script src="js/taxcalc-ui.js"></script>
+    <style>.fade-out { opacity: 0; transition: opacity 1.5s ease-out; }</style>
+</head>
+<body class="p-6">
+    <div id="shareMessage" class="absolute top-6 right-20 bg-gray-700 text-white px-4 py-2 rounded-md shadow-lg hidden"></div>
+    <button class="absolute top-6 right-6 text-white-500 p-2 rounded-full shadow-lg hover:bg-primary-focus" onclick="doShare()">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M17 11l-5-5-5 5h3v4h4v-4h3zm0 10H7v-2h10v2z" />
+        </svg>
+    </button>
+
+    <h1 class="text-3xl font-bold text-center mb-4">Hyresberäkning — Uthyrning av privatbostad</h1>
+
+    <!-- Beskattningsår -->
+    <div class="flex justify-center mb-6">
+        <select id="taxYear" class="select select-bordered" onchange="onTaxYearChange()">
+            <option value="2025">Inkomstår 2025</option>
+            <option value="2026">Inkomstår 2026</option>
+        </select>
+    </div>
+    <div id="taxYearWarning" class="alert alert-warning mb-6 hidden">
+        <span>OBS: Schablonavdraget 50 000 kr för 2026 är ett förslag och ännu ej beslutat.</span>
+    </div>
+
+    <div class="flex flex-col md:flex-row">
+        <!-- Inmatning -->
+        <div class="md:w-1/2">
+            <!-- Kostnader -->
+            <div class="card bg-base-200 shadow-xl p-6">
+                <h2 class="text-2xl font-bold mb-4">Kostnader (månad)</h2>
+                <div class="form-control mb-3">
+                    <label class="label" for="heating"><span class="label-text">El & Uppvärmning</span></label>
+                    <input type="number" id="heating" value="3200" min="0" step="any" class="input input-bordered w-full">
+                </div>
+                <div class="form-control mb-3">
+                    <label class="label" for="garbage"><span class="label-text">Renhållning & Vatten</span></label>
+                    <input type="number" id="garbage" value="1800" min="0" step="any" class="input input-bordered w-full">
+                </div>
+                <div class="form-control mb-3">
+                    <label class="label" for="chimney"><span class="label-text">Sotning</span></label>
+                    <input type="number" id="chimney" value="200" min="0" step="any" class="input input-bordered w-full">
+                </div>
+                <div class="form-control mb-3">
+                    <label class="label" for="broadband"><span class="label-text">Bredband</span></label>
+                    <input type="number" id="broadband" value="350" min="0" step="any" class="input input-bordered w-full">
+                </div>
+                <div class="form-control mb-3">
+                    <label class="label" for="renovation"><span class="label-text">Reparation & Underhåll</span></label>
+                    <input type="number" id="renovation" value="3000" min="0" step="any" class="input input-bordered w-full">
+                </div>
+                <div class="form-control mb-3">
+                    <label class="label" for="insurance"><span class="label-text">Försäkring</span></label>
+                    <input type="number" id="insurance" value="1000" min="0" step="any" class="input input-bordered w-full">
+                </div>
+                <div class="form-control mb-3">
+                    <label class="label" for="baseCost"><span class="label-text">Övriga kostnader</span></label>
+                    <input type="number" id="baseCost" value="0" min="0" step="any" class="input input-bordered w-full">
+                </div>
+            </div>
+            <br>
+            <!-- Lån & Ränta -->
+            <div class="card bg-base-200 shadow-xl p-6">
+                <h2 class="text-2xl font-bold mb-4">Lån & Ränta</h2>
+                <div class="form-control mb-3">
+                    <label class="label" for="loan"><span class="label-text">Lån (totalt)</span></label>
+                    <input type="number" id="loan" value="2800000" min="0" step="any" class="input input-bordered w-full">
+                </div>
+                <div class="form-control mb-3">
+                    <label class="label" for="rent"><span class="label-text">Ränta (%)</span></label>
+                    <input type="number" id="rent" value="3.57" min="0" step="any" class="input input-bordered w-full">
+                </div>
+                <div class="form-control mb-3">
+                    <label class="label" for="repayment"><span class="label-text">Amortering (månad)</span></label>
+                    <input type="number" id="repayment" value="0" min="0" step="any" class="input input-bordered w-full">
+                </div>
+                <div class="divider my-2"></div>
+                <div class="form-control mb-3">
+                    <label class="label" for="mortgage"><span class="label-text">Räntekostnad (månad)</span></label>
+                    <input type="number" id="mortgage" value="0" min="0" step="any" class="input input-bordered w-full">
+                </div>
+            </div>
+            <br>
+            <!-- Skatt -->
+            <div class="card bg-base-200 shadow-xl p-6">
+                <h2 class="text-2xl font-bold mb-4">Skatterelaterat</h2>
+                <div class="form-control mb-3">
+                    <label class="label" for="propertyTax"><span class="label-text">Fastighetsskatt (år)</span></label>
+                    <input type="number" id="propertyTax" value="9600" min="0" step="any" class="input input-bordered w-full">
+                </div>
+                <div class="form-control mb-3">
+                    <label class="label" for="fixedDeduction"><span class="label-text">Schablonavdrag (år)</span></label>
+                    <input type="number" id="fixedDeduction" value="40000" min="0" step="any" class="input input-bordered w-full">
+                </div>
+                <div class="form-control mb-3">
+                    <label class="label" for="percentDeduction"><span class="label-text">Procentavdrag (%)</span></label>
+                    <input type="number" id="percentDeduction" value="20" min="0" step="any" class="input input-bordered w-full">
+                </div>
+                <div class="form-control mb-3">
+                    <label class="label" for="percentMortgageDeduction"><span class="label-text">Ränteavdrag (%)</span></label>
+                    <input type="number" id="percentMortgageDeduction" value="30" min="0" step="any" class="input input-bordered w-full">
+                </div>
+                <div class="form-control mb-3">
+                    <label class="label" for="capitalGainTax"><span class="label-text">Kapitalskatt (%)</span></label>
+                    <input type="number" id="capitalGainTax" value="30" min="0" step="any" class="input input-bordered w-full">
+                </div>
+            </div>
+            <br>
+            <!-- Ägare -->
+            <div class="card bg-base-200 shadow-xl p-6">
+                <h2 class="text-2xl font-bold mb-4">Ägare</h2>
+                <div class="form-control mb-3">
+                    <label class="label" for="ownerCount"><span class="label-text">Antal ägare</span></label>
+                    <select id="ownerCount" class="select select-bordered w-full" onchange="onOwnerCountChange()">
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                    </select>
+                </div>
+                <div id="ownerRows"></div>
+                <div id="ownerSumWarning" class="alert alert-error mt-2 hidden">
+                    <span>Summan av ägarandelar måste vara 100%.</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Resultat -->
+        <div class="md:w-1/2 md:ml-8 mt-8 md:mt-0">
+            <div class="card bg-base-200 shadow-xl p-6">
+                <h2 class="text-2xl font-bold mb-4">Beräkningsresultat</h2>
+                <div class="grid grid-cols-2 gap-2">
+                    <p class="text-lg font-semibold">Totalkostnad (hyresvärd)</p>
+                    <p class="text-lg text-right" id="totalCost">0</p>
+                    <p class="text-lg font-semibold">Hyra utan avdrag</p>
+                    <p class="text-lg text-right" id="naiveRent">0</p>
+                    <p class="text-lg font-semibold">Beskattningsbar inkomst</p>
+                    <p class="text-lg text-right" id="taxableIncome">0</p>
+                    <p class="text-lg font-semibold">Skatt</p>
+                    <p class="text-lg text-right" id="tax">0</p>
+                    <div class="col-span-2"><div class="divider my-2"></div></div>
+                    <p class="text-lg font-semibold">Hyra (hyresgäst)</p>
+                    <p class="text-lg text-right font-bold" id="tenantRent">0</p>
+                </div>
+            </div>
+
+            <!-- Per-ägare resultat -->
+            <div id="ownerResults" class="mt-4 hidden"></div>
+
+            <!-- Länk till deklaration -->
+            <div class="mt-4 text-center">
+                <a id="deklarationLink" href="deklaration.html" class="btn btn-primary">Visa deklarationsunderlag &rarr;</a>
+            </div>
+
+            <!-- Beräkningsdetaljer -->
+            <div class="card bg-base-200 shadow-xl p-6 mt-4">
+                <h2 class="text-2xl font-bold mb-4">Beräkningsdetaljer</h2>
+                <div id="calculationDetails" class="prose"></div>
+            </div>
+
+            <!-- Ansvarsfriskrivning -->
+            <div class="card bg-yellow-200 text-black shadow-xl p-6 mt-4">
+                <h2 class="text-2xl font-bold mb-4">Ansvarsfriskrivning</h2>
+                <p>Resultaten från denna kalkylator är endast i informationssyfte och ska inte betraktas som juridisk, ekonomisk eller skatterådgivning. Inget ansvar tas för beräkningarnas korrekthet. Användning sker på egen risk.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    (function () {
+        'use strict';
+        var FC = TaxUI.formatCurrency;
+
+        // Fältreferenser
+        var fields = {
+            heating: document.getElementById('heating'),
+            garbage: document.getElementById('garbage'),
+            chimney: document.getElementById('chimney'),
+            broadband: document.getElementById('broadband'),
+            renovation: document.getElementById('renovation'),
+            insurance: document.getElementById('insurance'),
+            baseCost: document.getElementById('baseCost'),
+            loan: document.getElementById('loan'),
+            rent: document.getElementById('rent'),
+            repayment: document.getElementById('repayment'),
+            mortgage: document.getElementById('mortgage'),
+            propertyTax: document.getElementById('propertyTax'),
+            fixedDeduction: document.getElementById('fixedDeduction'),
+            percentDeduction: document.getElementById('percentDeduction'),
+            percentMortgageDeduction: document.getElementById('percentMortgageDeduction'),
+            capitalGainTax: document.getElementById('capitalGainTax'),
+            taxYear: document.getElementById('taxYear'),
+            ownerCount: document.getElementById('ownerCount')
+        };
+
+        function val(id) { return parseFloat(document.getElementById(id).value) || 0; }
+
+        // Ägarrader
+        window.onOwnerCountChange = function () {
+            var count = parseInt(fields.ownerCount.value);
+            var container = document.getElementById('ownerRows');
+            var defaultSplits = { 1: [100], 2: [50, 50], 3: [34, 33, 33], 4: [25, 25, 25, 25] };
+            var splits = defaultSplits[count] || [100];
+            var html = '';
+            for (var i = 0; i < count; i++) {
+                html += '<div class="flex gap-2 mb-2">' +
+                    '<input type="text" id="ownerName' + i + '" placeholder="Ägare ' + (i + 1) + '" class="input input-bordered input-sm flex-1">' +
+                    '<input type="number" id="ownerSplit' + i + '" value="' + splits[i] + '" min="0" max="100" step="any" class="input input-bordered input-sm w-24" oninput="calculate()">' +
+                    '<span class="self-center">%</span></div>';
+            }
+            container.textContent = '';
+            container.insertAdjacentHTML('beforeend', html);
+            calculate();
+        };
+
+        function getOwners() {
+            var count = parseInt(fields.ownerCount.value) || 1;
+            var owners = [];
+            var sum = 0;
+            for (var i = 0; i < count; i++) {
+                var nameEl = document.getElementById('ownerName' + i);
+                var splitEl = document.getElementById('ownerSplit' + i);
+                var pct = splitEl ? parseFloat(splitEl.value) || 0 : 100;
+                sum += pct;
+                owners.push({ name: nameEl ? (nameEl.value || 'Ägare ' + (i + 1)) : 'Ägare ' + (i + 1), pct: pct });
+            }
+            var warning = document.getElementById('ownerSumWarning');
+            warning.classList.toggle('hidden', Math.abs(sum - 100) < 0.01);
+            return owners;
+        }
+
+        function getInputs() {
+            return {
+                heating: val('heating'), garbage: val('garbage'), chimney: val('chimney'),
+                broadband: val('broadband'), renovation: val('renovation'), insurance: val('insurance'),
+                baseCost: val('baseCost'), loan: val('loan'), rent: val('rent'),
+                repayment: val('repayment'), mortgage: val('mortgage'),
+                propertyTax: val('propertyTax'), fixedDeduction: val('fixedDeduction'),
+                percentDeduction: val('percentDeduction'),
+                percentMortgageDeduction: val('percentMortgageDeduction'),
+                capitalGainTax: val('capitalGainTax')
+            };
+        }
+
+        window.calculate = function () {
+            var inp = getInputs();
+            var r = TaxCalc.fullCalculation(inp);
+            fields.mortgage.value = r.mortgage.toFixed(0);
+
+            document.getElementById('totalCost').textContent = FC(r.totalCost);
+            document.getElementById('naiveRent').textContent = FC(r.naiveRent);
+            document.getElementById('taxableIncome').textContent = FC(r.taxableIncome);
+            document.getElementById('tax').textContent = FC(r.tax);
+            document.getElementById('tenantRent').textContent = FC(r.tenantRent);
+
+            // Per-ägare
+            var owners = getOwners();
+            var ownerDiv = document.getElementById('ownerResults');
+            if (owners.length > 1) {
+                ownerDiv.classList.remove('hidden');
+                var html = '<div class="card bg-base-200 shadow-xl p-6"><h2 class="text-2xl font-bold mb-4">Per ägare (månad)</h2>';
+                owners.forEach(function (o) {
+                    var s = TaxCalc.calculateOwnerShare({
+                        monthlyRent: r.tenantRent, months: 12,
+                        schablonavdrag: inp.fixedDeduction,
+                        percentDeduction: inp.percentDeduction,
+                        capitalGainTax: inp.capitalGainTax
+                    }, o.pct);
+                    html += '<div class="mb-4 p-3 bg-base-300 rounded">' +
+                        '<h3 class="font-bold text-lg mb-2">' + escapeHtml(o.name) + ' (' + o.pct + '%)</h3>' +
+                        '<div class="grid grid-cols-2 gap-1 text-sm">' +
+                        '<span>Hyresinkomst (år):</span><span class="text-right">' + FC(s.income) + '</span>' +
+                        '<span>Schablonavdrag:</span><span class="text-right">' + FC(s.schablonavdrag) + '</span>' +
+                        '<span>20%-avdrag:</span><span class="text-right">' + FC(s.percentAvdrag) + '</span>' +
+                        '<span>Beskattningsbar:</span><span class="text-right">' + FC(s.taxable) + '</span>' +
+                        '<span class="font-semibold">Skatt:</span><span class="text-right font-semibold">' + FC(s.tax) + '</span>' +
+                        '</div></div>';
+                });
+                html += '</div>';
+                ownerDiv.textContent = '';
+                ownerDiv.insertAdjacentHTML('beforeend', html);
+            } else {
+                ownerDiv.classList.add('hidden');
+            }
+
+            // Deklarationslänk
+            updateDeklarationLink();
+
+            // Beräkningsdetaljer
+            renderDetails(inp, r);
+        };
+
+        function escapeHtml(text) {
+            var div = document.createElement('div');
+            div.appendChild(document.createTextNode(text));
+            return div.innerHTML;
+        }
+
+        function renderDetails(inp, r) {
+            var pd = inp.percentDeduction;
+            var pmd = inp.percentMortgageDeduction;
+            var cgt = inp.capitalGainTax;
+            var fdA = inp.fixedDeduction;
+            var d = '';
+            d += '<h3>Steg 1: Beräkna räntekostnad</h3>';
+            d += '<p>$$\\text{Ränta} = \\frac{' + inp.loan + '}{12} \\times \\frac{' + inp.rent + '}{100} = ' + r.mortgage.toFixed(2) + '$$</p>';
+            d += '<h3>Steg 2: Räntekostnad efter ränteavdrag</h3>';
+            d += '<p>$$' + r.mortgage.toFixed(2) + ' \\times (1 - ' + pmd + '\\%) = ' + r.deductedMortgage.toFixed(2) + '$$</p>';
+            d += '<h3>Steg 3: Totalkostnad</h3>';
+            d += '<p>$$' + r.totalCost.toFixed(2) + ' \\text{ kr/mån}$$</p>';
+            d += '<h3>Steg 4: Naiv hyresuppskattning</h3>';
+            d += '<p>$$\\frac{' + r.totalCost.toFixed(2) + '}{1 - ' + cgt + '\\%} = ' + r.naiveRent.toFixed(2) + '$$</p>';
+            d += '<h3>Steg 5: Förfinad hyresberäkning</h3>';
+            d += '<p>$$\\text{Hyra} - \\text{Skatt} = \\text{Totalkostnad}$$</p>';
+            d += '<p>$$\\text{Hyra} = ' + r.tenantRent.toFixed(2) + '$$</p>';
+            d += '<h3>Steg 6: Beskattningsbar inkomst</h3>';
+            d += '<p>$$' + r.tenantRent.toFixed(2) + ' - (' + r.tenantRent.toFixed(2) + ' \\times ' + pd + '\\% + \\frac{' + fdA + '}{12}) = ' + r.taxableIncome.toFixed(2) + '$$</p>';
+            d += '<h3>Steg 7: Skatt</h3>';
+            d += '<p>$$' + r.taxableIncome.toFixed(2) + ' \\times ' + cgt + '\\% = ' + r.tax.toFixed(2) + '$$</p>';
+            d += '<h3>Steg 8: Verifiering</h3>';
+            d += '<p>$$' + r.tenantRent.toFixed(2) + ' - ' + r.tax.toFixed(2) + ' = ' + (r.tenantRent - r.tax).toFixed(2) + '$$</p>';
+            d += '<p><b>Totalkostnad stämmer: ' + r.totalCost.toFixed(2) + '</b></p>';
+
+            var el = document.getElementById('calculationDetails');
+            el.textContent = '';
+            el.insertAdjacentHTML('beforeend', d);
+            if (typeof MathJax !== 'undefined') MathJax.typesetPromise();
+        }
+
+        function updateDeklarationLink() {
+            var params = new URLSearchParams();
+            Object.keys(fields).forEach(function (k) { params.set(k, fields[k].value); });
+            // Ägare
+            var count = parseInt(fields.ownerCount.value) || 1;
+            var splits = [], names = [];
+            for (var i = 0; i < count; i++) {
+                var s = document.getElementById('ownerSplit' + i);
+                var n = document.getElementById('ownerName' + i);
+                splits.push(s ? s.value : '100');
+                names.push(n ? encodeURIComponent(n.value) : '');
+            }
+            params.set('ownerSplit', splits.join(','));
+            params.set('ownerNames', names.join(','));
+            document.getElementById('deklarationLink').href = 'deklaration.html?' + params.toString();
+        }
+
+        window.onTaxYearChange = function () {
+            var year = parseInt(fields.taxYear.value);
+            var rules = TaxCalc.getTaxRules(year);
+            fields.fixedDeduction.value = rules.schablonavdrag;
+            fields.percentDeduction.value = rules.percentAvdrag;
+            fields.capitalGainTax.value = rules.kapitalskatt;
+            fields.percentMortgageDeduction.value = rules.ranteavdrag;
+            document.getElementById('taxYearWarning').classList.toggle('hidden', !rules.proposed);
+            calculate();
+        };
+
+        window.doShare = function () {
+            var allFields = Object.assign({}, fields);
+            TaxUI.shareLink(allFields, 'Hyresberäkning', document.getElementById('shareMessage'));
+        };
+
+        // Initiera
+        TaxUI.injectInfoIconSvg();
+
+        // Ladda URL-params
+        if (window.location.search) {
+            TaxUI.loadFromURL(fields);
+            var params = new URLSearchParams(window.location.search);
+            if (params.get('ownerCount')) {
+                fields.ownerCount.value = params.get('ownerCount');
+            }
+        }
+
+        onOwnerCountChange();
+
+        // Ladda ägarsplittar från URL
+        if (window.location.search) {
+            var params2 = new URLSearchParams(window.location.search);
+            var splitStr = params2.get('ownerSplit');
+            var nameStr = params2.get('ownerNames');
+            if (splitStr) {
+                var splits = splitStr.split(',');
+                splits.forEach(function (s, i) {
+                    var el = document.getElementById('ownerSplit' + i);
+                    if (el) el.value = s;
+                });
+            }
+            if (nameStr) {
+                var names = nameStr.split(',');
+                names.forEach(function (n, i) {
+                    var el = document.getElementById('ownerName' + i);
+                    if (el) el.value = decodeURIComponent(n);
+                });
+            }
+        }
+
+        // Lyssnare
+        var inputEls = [
+            fields.heating, fields.garbage, fields.chimney, fields.broadband,
+            fields.renovation, fields.insurance, fields.baseCost,
+            fields.loan, fields.rent, fields.repayment, fields.mortgage,
+            fields.propertyTax, fields.fixedDeduction, fields.percentDeduction,
+            fields.percentMortgageDeduction, fields.capitalGainTax
+        ];
+        TaxUI.initInputListeners(inputEls, calculate);
+
+        calculate();
+    })();
+    </script>
+</body>
+</html>
