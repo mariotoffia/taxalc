@@ -32,6 +32,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
   max-height: 70vh; overflow-y: auto;
 }
 .info-panel.expanded { transform: translateY(0); }
+.info-panel.dragging { transition: none; }
+.info-panel .handle, .info-panel .summary { touch-action: none; }
 .info-panel .handle {
   width: 40px; height: 4px; background: #ccc; border-radius: 2px;
   margin: 8px auto; cursor: pointer;
@@ -109,8 +111,8 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
 </button>
 
 <div class="info-panel" id="infoPanel">
-  <div class="handle" onclick="togglePanel()"></div>
-  <div class="summary" onclick="togglePanel()">
+  <div class="handle"></div>
+  <div class="summary">
     <h2 id="panelTitle">Häckeberga — Skåneleden SL2</h2>
     <span class="badge" id="panelBadge">3 etapper</span>
   </div>
@@ -307,14 +309,15 @@ window.toggleGPS = function toggleGPS() {
     if (gpsCircle) { map.removeLayer(gpsCircle); gpsCircle = null; }
   } else if (gpsState === 1) {
     btn.className = 'gps-btn active';
-    startGPS(false);
+    startGPS();
   } else {
     btn.className = 'gps-btn tracking';
-    startGPS(true);
+    startGPS();
+    if (gpsMarker) map.setView(gpsMarker.getLatLng(), Math.max(map.getZoom(), 15));
   }
 }
 
-function startGPS(follow) {
+function startGPS() {
   if (!navigator.geolocation) { alert('GPS stöds inte i din webbläsare.'); return; }
   if (watchId !== null) navigator.geolocation.clearWatch(watchId);
 
@@ -340,10 +343,11 @@ function startGPS(follow) {
       gpsCircle.setRadius(acc);
     }
 
-    if (follow || gpsState === 2) {
+    if (gpsState === 2) {
       map.setView([lat, lng], Math.max(map.getZoom(), 15));
     }
   }, function(err) {
+    if (watchId !== null) { navigator.geolocation.clearWatch(watchId); watchId = null; }
     alert('Kunde inte hämta position: ' + err.message);
     gpsState = 0;
     document.getElementById('gpsBtn').className = 'gps-btn';
@@ -354,10 +358,103 @@ function startGPS(follow) {
   });
 };
 
-// === INFO PANEL TOGGLE ===
+// === GPS AUTO-DOWNGRADE ON USER PAN ===
+map.on('dragstart', function() {
+  if (gpsState === 2) {
+    gpsState = 1;
+    document.getElementById('gpsBtn').className = 'gps-btn active';
+  }
+});
+
+var panel = document.getElementById('infoPanel');
+var panelDrag = { startY: 0, startTranslate: 0, isDragging: false, handledByTouch: false, timestamps: [], positions: [] };
+
+function getPanelTranslateY() {
+  var matrix = new DOMMatrix(window.getComputedStyle(panel).transform);
+  return matrix.m42;
+}
+
+function getCollapsedY() { return panel.offsetHeight - 80; }
+
 window.togglePanel = function togglePanel() {
-  document.getElementById('infoPanel').classList.toggle('expanded');
+  panel.classList.toggle('expanded');
 };
+
+// Touch drag on handle and summary only
+var dragTargets = panel.querySelectorAll('.handle, .summary');
+dragTargets.forEach(function(el) {
+  el.addEventListener('touchstart', function(e) {
+    if (e.touches.length !== 1) { panelDrag.isDragging = false; return; }
+    panel.classList.add('dragging');
+    panelDrag.startTranslate = getPanelTranslateY();
+    panelDrag.startY = e.touches[0].clientY;
+    panelDrag.isDragging = true;
+    panelDrag.handledByTouch = false;
+    panelDrag.timestamps = [Date.now()];
+    panelDrag.positions = [e.touches[0].clientY];
+    e.preventDefault();
+  }, { passive: false });
+
+  el.addEventListener('click', function() {
+    if (panelDrag.handledByTouch) { panelDrag.handledByTouch = false; return; }
+    togglePanel();
+  });
+});
+
+document.addEventListener('touchmove', function(e) {
+  if (!panelDrag.isDragging) return;
+  if (e.touches.length !== 1) { panelDrag.isDragging = false; panel.classList.remove('dragging'); panel.style.transform = ''; return; }
+  var y = e.touches[0].clientY;
+  var delta = y - panelDrag.startY;
+  var newY = Math.max(0, Math.min(getCollapsedY(), panelDrag.startTranslate + delta));
+  panel.style.transform = 'translateY(' + newY + 'px)';
+  panelDrag.timestamps.push(Date.now());
+  panelDrag.positions.push(y);
+  if (panelDrag.timestamps.length > 5) { panelDrag.timestamps.shift(); panelDrag.positions.shift(); }
+  e.preventDefault();
+}, { passive: false });
+
+document.addEventListener('touchend', function() {
+  if (!panelDrag.isDragging) return;
+  panelDrag.isDragging = false;
+  panelDrag.handledByTouch = true;
+  panel.classList.remove('dragging');
+
+  var currentY = getPanelTranslateY();
+  var totalMove = Math.abs(currentY - panelDrag.startTranslate);
+
+  // Small move = tap → toggle
+  if (totalMove < 10) {
+    panel.style.transform = '';
+    togglePanel();
+    return;
+  }
+
+  // Calculate velocity from last touch points
+  var velocity = 0;
+  var len = panelDrag.timestamps.length;
+  if (len >= 2) {
+    var dt = panelDrag.timestamps[len - 1] - panelDrag.timestamps[0];
+    var dy = panelDrag.positions[len - 1] - panelDrag.positions[0];
+    if (dt > 0) velocity = dy / dt; // positive = downward
+  }
+
+  var collapsedY = getCollapsedY();
+  var shouldExpand = Math.abs(velocity) > 0.3
+    ? velocity < 0   // flick up = expand
+    : currentY < collapsedY * 0.5;  // past midpoint = expand
+
+  panel.style.transform = '';
+  if (shouldExpand) { panel.classList.add('expanded'); }
+  else { panel.classList.remove('expanded'); }
+});
+
+document.addEventListener('touchcancel', function() {
+  if (!panelDrag.isDragging) return;
+  panelDrag.isDragging = false;
+  panel.classList.remove('dragging');
+  panel.style.transform = '';
+});
 
 // === SCALE BAR ===
 L.control.scale({ metric: true, imperial: false, position: 'bottomleft' }).addTo(map);
